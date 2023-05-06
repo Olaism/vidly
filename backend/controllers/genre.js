@@ -1,4 +1,4 @@
-const { genreValidator, Genre } = require("../models/genres");
+const { genreValidator, Genre } = require("../models/genre");
 const { getValidationErrors } = require("../utils");
 
 const getGenres = async (req, res) => {
@@ -9,7 +9,6 @@ const getGenres = async (req, res) => {
 const postGenres = async (req, res) => {
   const { value, error } = genreValidator.validate(req.body);
   if (error) {
-    console.log(error);
     return res.status(400).send(error.message);
   }
   const genre = new Genre(value);
