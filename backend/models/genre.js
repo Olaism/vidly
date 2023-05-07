@@ -1,27 +1,22 @@
-const { connect, model, Schema } = require("mongoose");
+const { model, Schema } = require("mongoose");
 const Joi = require("joi");
 
-const connectMongoose = async () => {
-  await connect("mongodb://127.0.0.1:27017/vidly");
-};
+const genreSchema = Schema({
+  name: {
+    type: String,
+    required: true,
+    minLength: 3,
+    maxLength: 50,
+    unique: true,
+  },
+});
 
-connectMongoose().catch((err) => console.log(err));
-
-const Genre = model(
-  "Genre",
-  Schema({
-    name: {
-      type: String,
-      required: true,
-      minLength: 3,
-      unique: true,
-    },
-  })
-);
+const Genre = model("Genre", genreSchema);
 
 const genreValidator = Joi.object({
-  name: Joi.string().min(3).required(),
+  name: Joi.string().min(3).max(50).required(),
 });
 
 exports.genreValidator = genreValidator;
+exports.genreSchema = genreSchema;
 exports.Genre = Genre;
