@@ -2,7 +2,7 @@ const { Customer, customerValidator } = require("../models/customer");
 const { getValidationErrors } = require("../utils");
 
 const getCustomers = async (req, res) => {
-  const customers = await Customer.find();
+  const customers = await Customer.find().select("_id name isGold");
   res.send(customers);
 };
 
@@ -26,9 +26,15 @@ const postCustomers = async (req, res) => {
 const getCustomer = async (req, res) => {
   // get customer or send 404
   try {
-    const customer = await Customer.findById(req.params.id);
-    customer && res.send(customer);
-    return res.status(404).send("Not found.");
+    const customer = await Customer.findById(
+      req.params.id,
+      "name phone isGold"
+    );
+    if (!customer) {
+      return res.status(404).send("Not found.");
+    } else {
+      res.send(customer);
+    }
   } catch (err) {
     return res.status(404).send("Not found.");
   }
@@ -51,12 +57,9 @@ const putCustomer = async (req, res) => {
   }
   // update the customer or send error
   try {
-    const customer = await Customer.findByIdAndUpdate(
-      { _id: req.params.id },
-      {
-        $set: value,
-      }
-    );
+    const customer = await Customer.findByIdAndUpdate(req.params.id, {
+      $set: value,
+    });
     res.send(customer);
   } catch (error) {
     const errors = getValidationErrors(error);
@@ -65,13 +68,16 @@ const putCustomer = async (req, res) => {
 };
 
 const deleteCustomer = async (req, res) => {
-  // get the course
+  // get the customer
   try {
-    const customer = await Customer.findByIdAndRemove({ _id: req.params.id });
-    // send 404 if course does not exists!
-    if (!customer) {
-      return res.status(404).send("Not found");
-    }
+    const customer = await Customer.findById(req.params.id);
+    if (!customer) return res.status(404).send("Not Found.");
+  } catch (error) {
+    return res.status(404).send("Not Found.");
+  }
+  // delete the customer
+  try {
+    const customer = await Customer.findByIdAndRemove(req.params.id);
     res.send(customer);
   } catch (err) {
     res.status(404).send("Not found.");

@@ -5,7 +5,6 @@ const {
   getGenre,
   postGenres,
   putGenre,
-  patchGenre,
   deleteGenre,
 } = require("../controllers/genre");
 
@@ -18,8 +17,6 @@ router.post("/", postGenres);
 router.get("/:id", getGenre);
 
 router.put("/:id", putGenre);
-
-router.patch("/:id", patchGenre);
 
 router.delete("/:id", deleteGenre);
 
