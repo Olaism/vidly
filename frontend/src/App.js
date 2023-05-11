@@ -1,11 +1,23 @@
 import React, { useState } from "react";
 import Header from "./components/Header";
 import Movies from "./components/Movies";
+import ListGroup from "./components/common/ListGroup";
 import movieData from "./datas/fakeMovieService";
+import genreData from "./datas/fakeGenreService";
+import { filterItemByGenre } from "./utils";
 import "bootstrap/dist/css/bootstrap.css";
 
 const App = () => {
   const [movies, setMovies] = useState([...movieData]);
+  const [genres, setGenres] = useState([
+    { _id: "1", name: "All" },
+    ...genreData,
+  ]);
+  const [currentGenre, setcurrentGenre] = useState("All");
+
+  const handleGenreChange = (name) => {
+    setcurrentGenre(name);
+  };
 
   const handleLiked = (movieId) => {
     // Find the movie to update
@@ -42,12 +54,31 @@ const App = () => {
     console.log(`Movie with ${movieId} clicked!`);
   };
 
+  const filteredMovies = filterItemByGenre(movies, currentGenre);
+
   return (
     <>
-      <Header count={movies.length} />
-      {movies.length > 0 && (
-        <Movies movies={movies} onLiked={handleLiked} onDelete={handleDelete} />
-      )}
+      <Header count={filteredMovies.length} />
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-lg-2 col-md-12">
+            <ListGroup
+              items={genres}
+              currentItem={currentGenre}
+              onItemChange={handleGenreChange}
+            />
+          </div>
+          <div className="col-lg-10 col-md-12">
+            {movies.length > 0 && (
+              <Movies
+                movies={filteredMovies}
+                onLiked={handleLiked}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </>
   );
 };
