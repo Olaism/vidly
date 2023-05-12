@@ -3,9 +3,15 @@ import Pagination from "./common/Pagination";
 import { paginate } from "../utils";
 import React, { useState } from "react";
 
-const Movies = ({ movies, onDelete, onLiked }) => {
+const Movies = ({
+  movies,
+  currentPage,
+  setCurrentPage,
+  onLiked,
+  onDelete,
+  onSort,
+}) => {
   const [pageSize, setPageSize] = useState(4);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -19,10 +25,18 @@ const Movies = ({ movies, onDelete, onLiked }) => {
         <thead>
           <tr>
             <th scope="col">#id</th>
-            <th scope="col">Title</th>
-            <th scope="col">Genre</th>
-            <th scope="col">numberInStock</th>
-            <th scope="col">dailyRentalRate</th>
+            <th scope="col" onClick={() => onSort("title")}>
+              Title
+            </th>
+            <th scope="col" onClick={() => onSort("genre.name")}>
+              Genre
+            </th>
+            <th scope="col" onClick={() => onSort("numberInStock")}>
+              Stock
+            </th>
+            <th scope="col" onClick={() => onSort("dailyRentalRate")}>
+              Rental
+            </th>
             <th scope="col">liked</th>
             <th scope="col">&nbsp;</th>
           </tr>

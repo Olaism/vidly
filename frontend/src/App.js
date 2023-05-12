@@ -1,22 +1,26 @@
 import React, { useState } from "react";
 import Header from "./components/Header";
-import Movies from "./components/Movies";
 import ListGroup from "./components/common/ListGroup";
 import movieData from "./datas/fakeMovieService";
 import genreData from "./datas/fakeGenreService";
 import { filterItemByGenre } from "./utils";
 import "bootstrap/dist/css/bootstrap.css";
+import MoviesTables from "./components/moviesTable";
+import _ from "lodash";
 
 const App = () => {
   const [movies, setMovies] = useState([...movieData]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [genres, setGenres] = useState([
     { _id: "1", name: "All" },
     ...genreData,
   ]);
-  const [currentGenre, setcurrentGenre] = useState("All");
+  const [selectedGenre, setSelectedGenre] = useState("All");
+  const [sortColumn, setSortColumn] = useState({ path: "title", order: "asc" });
 
-  const handleGenreChange = (name) => {
-    setcurrentGenre(name);
+  const handleGenreSelect = (genreName) => {
+    setCurrentPage(1);
+    setSelectedGenre(genreName);
   };
 
   const handleLiked = (movieId) => {
@@ -32,7 +36,7 @@ const App = () => {
     // Use `map()` to create a new array with the updated objects
     const updatedMovies = movies.map((movie) => {
       // Use destructuring to copy the properties of the object
-      const { _id, liked } = movie;
+      const { _id } = movie;
 
       // Check if this is the object to update
       if (_id === idToUpdate) {
@@ -48,35 +52,53 @@ const App = () => {
     setMovies(updatedMovies);
   };
 
+  const handleSort = (path) => {
+    const newSortColumn = { ...sortColumn };
+    if (newSortColumn.path === path) {
+      newSortColumn.order = newSortColumn.order === "asc" ? "desc" : "asc";
+    } else {
+      newSortColumn.path = path;
+      newSortColumn.order = "asc";
+    }
+    setSortColumn(newSortColumn);
+  };
+
   const handleDelete = (movieId) => {
     const updatedMovies = movies.filter((m) => m._id !== movieId);
     setMovies(updatedMovies);
-    console.log(`Movie with ${movieId} clicked!`);
   };
 
-  const filteredMovies = filterItemByGenre(movies, currentGenre);
+  const filteredMovies = selectedGenre
+    ? filterItemByGenre(movies, selectedGenre)
+    : movies;
+
+  const sortedMovies = _.orderBy(
+    filteredMovies,
+    [sortColumn.path],
+    [sortColumn.order]
+  );
 
   return (
     <>
-      <Header count={filteredMovies.length} />
-      <div className="container">
+      <Header count={sortedMovies.length} />
+      <div className="container mt-3">
         <div className="row justify-content-center">
           <div className="col-lg-2 col-md-12">
             <ListGroup
               items={genres}
-              currentItem={currentGenre}
-              onItemChange={handleGenreChange}
+              selectedItem={selectedGenre}
+              onItemSelect={handleGenreSelect}
             />
           </div>
-          <div className="col-lg-10 col-md-12">
-            {movies.length > 0 && (
-              <Movies
-                movies={filteredMovies}
-                onLiked={handleLiked}
-                onDelete={handleDelete}
-              />
-            )}
-          </div>
+          <MoviesTables
+            moviesLength={movies.length}
+            sortedMovies={sortedMovies}
+            onLiked={handleLiked}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            onDelete={handleDelete}
+            onSort={handleSort}
+          />
         </div>
       </div>
     </>
