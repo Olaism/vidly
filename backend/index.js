@@ -4,7 +4,8 @@ const genreRouter = require("./routers/genre");
 const customerRouter = require("./routers/customer");
 const movieRouter = require("./routers/movie");
 const rentalRouter = require("./routers/rental");
-const { userRouter } = require("./routers/user");
+const userRouter = require("./routers/user");
+const authRouter = require("./routers/auth");
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.use("/api/v1/genres", genreRouter);
 app.use("/api/v1/customers", customerRouter);
 app.use("/api/v1/movies", movieRouter);
 app.use("/api/v1/rentals", rentalRouter);
-app.use("api/v1/users", userRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/auth", authRouter);
 app.use((req, res) => {
   res.status(404).send("Not found.");
 });

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 function getValidationErrors(err) {
   const new_obj = {};
@@ -22,6 +23,18 @@ function validateId(id) {
   return mongoose.Types.ObjectId.isValid(id);
 }
 
+async function hashPassword(password) {
+  const salt = await bcrypt.genSalt();
+  const hash = await bcrypt.hash(password, salt);
+  return hash;
+}
+
+async function isValidPassword(password, hashedPassword) {
+  return await bcrypt.compare(password, hashedPassword);
+}
+
 exports.getValidationErrors = getValidationErrors;
 exports.calcRentalFee = calcRentalFee;
 exports.validateId = validateId;
+exports.hashPassword = hashPassword;
+exports.isValidPassword = isValidPassword;
